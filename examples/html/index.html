@@ -1,0 +1,296 @@
+<html>
+
+<head>
+    <!-- <script src="/node_modules/tweakpane/dist/tweakpane.js" type="module"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/tweakpane@3.1.0/dist/tweakpane.min.js"></script> -->
+    <!-- <script src="../../node_modules/@tweakpane/plugin-essentials/dist/tweakpane-plugin-essentials.min.js" type="module"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tormak/tweakpane-plugin-gradient@1.7.0/dist/tormak-tweakpane-plugin-gradient.min.js"></script> -->
+
+    <script src="../../libs/plotly.min.js"></script>
+    <!-- <script src="../../libs/tormak-tweakpane-plugin-gradient.min.js"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="/dist/@youwol/app-stress-2.js" type="module"></script>
+</head>
+
+<body>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- See https://www.w3schools.com/howto/howto_js_sidenav.asp -->
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+            style="margin-left: 5px;">
+            Help
+        </button>
+        <div class="col-sm-6" id="gui" style="margin: 5px; opacity: 100%; min-width: 95%;"></div>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="main">
+        <span style="font-size:30px;cursor:pointer;" onclick="openNav()" id="mainMenu">&#9776;</span>
+        <div class="container">
+            <div class="row align-items-start">
+                <div id="console"
+                    style="left:0%; border: 2px solid #000000; padding-bottom: 10px; border-radius: 5px;margin-top: 0px; background-color: rgb(232, 232, 232);">
+                    <center>
+                        <p id="title"><strong>Result comes here</strong></p>
+                    </center>
+                    <ol>
+                        <li>
+                            R = 0
+                        </li>
+                        <li>
+                            theta = 23
+                        </li>
+                    </ol>
+
+                </div>
+                <div>
+                    <center>
+                        <div id="domainDiv" style="margin-top: 5px;">
+                        </div>
+                        <div id="histogramDiv" style="margin-top: 5px;">
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function generateRandomDomain(n) {
+            const r = []
+            const d = 8
+            for (let i = 0.; i < n; ++i) {
+                const x = i / n * d
+                for (let j = 0.; j < n; ++j) {
+                    const y = j / n * d
+                    r.push(Math.sin(x) * Math.cos(y) ** 2)
+                }
+            }
+            return r
+        }
+
+        function doDomain(
+            { div, width, n, m, values }) {
+            const size = n
+            const x = new Array(size)
+            const y = new Array(size)
+            const z = new Array(size)
+
+            for (let i = 0; i < size; i++) {
+                x[i] = y[i] = i / (n - 1)
+                z[i] = new Array(size)
+            }
+
+            let k = 0
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    z[i][j] = values[k++]
+                }
+            }
+
+            const data = [{
+                z: z,
+                x: x,
+                y: y,
+                type: 'contour',
+                colorbar: {
+                    thickness: 30,
+                    title: 'Cost',
+                    titleside: 'right',
+                    titlefont: {
+                        size: 14,
+                        family: 'Arial, sans-serif'
+                    }
+                }
+            }]
+
+            const layout = {
+                title: 'Domain',
+                paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
+                plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
+                height: 500,
+                xaxis: {
+                    scaleanchor: 'y',
+                    constrain: "domain",
+                    title: {
+                        text: 'R',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#000000'
+                        }
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: 'Theta',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#000000'
+                        }
+                    }
+                }
+            }
+
+            const config = { responsive: true }
+
+            Plotly.newPlot(div, data, layout, config)
+
+            const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
+            observer.observe(document.getElementById(div))
+        }
+
+        function doHistogram({ div, values, nbBins = 10 }) {
+            const trace = {
+                xbins: { size: (1 - 0) / (nbBins - 1), start: 0, end: 1 },
+                x: values,
+                type: 'histogram',
+                marker: {
+                    color: 'rgb(158,202,225)',
+                    opacity: 0.6,
+                    line: {
+                        color: 'rgb(8,48,107)',
+                        width: 1.5
+                    }
+                }
+            }
+            const layout = {
+                bargap: 5,
+                title: 'Histogram',
+                paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
+                plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
+                // height: 500,
+                width: 500,
+                xaxis: {
+                    // scaleanchor: 'y',
+                    // constrain: "domain",
+                    title: {
+                        text: 'Angular misfit',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#000000'
+                        }
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: 'Nb of data',
+                        font: {
+                            family: 'Courier New, monospace',
+                            size: 18,
+                            color: '#000000'
+                        }
+                    }
+                }
+            }
+
+            Plotly.newPlot(div, [trace], layout)
+
+            const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
+            observer.observe(document.getElementById(div))
+        }
+    </script>
+
+    <script>
+        function openNav() {
+            const w = 300
+            document.getElementById("mySidenav").style.width = `${w}px`
+            document.getElementById("main").style.marginLeft = `${w}px`
+            document.getElementById("mainMenu").style.opacity = 0
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0px"
+            document.getElementById("main").style.marginLeft = "0px"
+            document.getElementById("mainMenu").style.opacity = 1
+        }
+    </script>
+
+    <script type="module">
+        const gui = window['@youwol/app-stress-2']
+
+        // ESC key for the navbar
+        $(document).keyup(e => {
+            if (e.keyCode === 27) {
+                const w = document.getElementById("mySidenav").style.width
+                if (w === '0px') {
+                    openNav()
+                }
+                else {
+                    closeNav()
+                }
+            }
+        })
+
+        doDomain({
+            div: 'domainDiv',
+            n: 50,
+            values: generateRandomDomain(50)
+        })
+
+        doHistogram({
+            div: 'histogramDiv',
+            values: new Array(50).fill(0).map(_ => Math.random())
+        })
+
+        gui.createGUI('gui')
+    </script>
+</body>
+
+</html>
