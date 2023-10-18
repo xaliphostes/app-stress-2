@@ -36,7 +36,6 @@
         "jest-junit": "15.0.0",
         "prettier": "^2.7.1",
         "prettier-plugin-properties": "^0.2.0",
-        "serve": "http-server . -p 92 -o /examples/html/index.html",
         "ts-jest": "29.0.3",
         "ts-loader": "9.4.1",
         "tslib": "^2.4.1",
