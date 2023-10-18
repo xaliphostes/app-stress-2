@@ -20,7 +20,7 @@
 
     <link rel="stylesheet" href="style.css" />
 
-    <script src="/dist/@youwol/app-stress-2.js" type="module"></script>
+    <script src="/dist/@alfredicus/app-stress-2.js" type="module"></script>
 </head>
 
 <body>
@@ -47,6 +47,7 @@
     <div class="navbar">
         <span style="font-size:30px;cursor:pointer; color: white; margin-left: 5px;" onclick="openNav()"
             id="mainMenu">&#9776;</span>
+            <h3 style="color: white;">Stress Fault</h3>
         <button type="button" class="btn btn-primary" data-toggle="modal" id="myBtn"
             style="margin-left: 5px; margin-right: 5px;">
             Help
@@ -66,17 +67,9 @@
                 <div id="console"
                     style="left:0%; border: 2px solid #000000; padding-bottom: 10px; border-radius: 5px;margin-top: 0px; background-color: rgb(232, 232, 232);">
                     <center>
-                        <p id="title"><strong>Result comes here</strong></p>
+                        <p id="title"><strong>Results</strong></p>
                     </center>
-                    <ol>
-                        <li>
-                            R = 0
-                        </li>
-                        <li>
-                            theta = 23
-                        </li>
-                    </ol>
-
+                    <p id="info"></p>
                 </div>
                 <div>
                     <center>
@@ -90,8 +83,11 @@
         </div>
     </div>
 
+    <input id="upload" type="file" style="visibility: hidden" />
+
     <script>
 
+        /*
         function generateRandomDomain(n) {
             const r = []
             const d = 8
@@ -228,6 +224,8 @@
             const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
             observer.observe(document.getElementById(div))
         }
+        */
+
     </script>
 
     <script>
@@ -274,7 +272,7 @@
     </script>
 
     <script type="module">
-        const gui = window['@youwol/app-stress-2']
+        const gui = window['@alfredicus/app-stress-2']
 
         // ESC key for the navbar
         $(document).keyup(e => {
@@ -291,6 +289,7 @@
 
         setupHelp()
 
+        /*
         doDomain({
             div: 'domainDiv',
             n: 50,
@@ -301,6 +300,7 @@
             div: 'histogramDiv',
             values: new Array(50).fill(0).map(_ => Math.random())
         })
+        */
 
         gui.createGUI('gui')
     </script>

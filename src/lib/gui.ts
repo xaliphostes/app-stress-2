@@ -1,16 +1,41 @@
-import { Pane, TabApi } from "tweakpane"
+import { Pane } from "tweakpane"
 import * as EssentialsPlugin from '@tweakpane/plugin-essentials'
-// import * as TWFile from '../../libs/tweakpane-plugin-file-import.min'
+import { model } from "."
 
 export function createGUI(div: string) {
+    // ---------------------------------------------------------------------------------
+    {
+        const upload = document.getElementById('upload') as HTMLInputElement
+        upload.onchange = () => {
+            upload.files[0].arrayBuffer().then(arrayBuffer => {
+                model.addData(arrayBuffer)
+            })
+        }
+    }
+    // ---------------------------------------------------------------------------------
+
     const pane = new Pane({
         title: 'Parameters',
         container: document.getElementById(div),
     })
 
     pane.registerPlugin(EssentialsPlugin)
-    // pane.registerPlugin(TWFile)
 
+    pane.addButton({
+        title: 'Upload data',
+    }).on('click', () => document.getElementById('upload').click())
+
+    pane.addButton({
+        title: 'Clear'
+    }).on('click', () => model.clear())
+
+    pane.addBlade({view: 'separator'})
+
+    pane.addButton({
+        title: 'Run'
+    }).on('click', () => model.run())
+
+    /*
     const PARAMS = {
         speed: 0.5,
         quality: 0,
@@ -24,7 +49,6 @@ export function createGUI(div: string) {
         color: { x: 0, y: 0, z: 0, w: 1 },
         text: "0" // readonly
     }
-
 
     pane.addBinding(PARAMS, 'speed')
     pane.addBinding(PARAMS, 'speed', { min: 0, max: 100, })
@@ -81,4 +105,5 @@ export function createGUI(div: string) {
     pane.addBinding(PARAMS, 'text', {
         readonly: true,
     })
+    */
 }

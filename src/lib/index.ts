@@ -1,2 +1,6 @@
+import { Model } from './model'
+
 export * from './gui'
-// export * from './doDomain'
+export * from './model'
+
+export const model = new Model()
