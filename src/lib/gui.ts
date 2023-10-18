@@ -1,11 +1,15 @@
 import { Pane, TabApi } from "tweakpane"
 import * as EssentialsPlugin from '@tweakpane/plugin-essentials'
+// import * as TWFile from '../../libs/tweakpane-plugin-file-import.min'
 
 export function createGUI(div: string) {
     const pane = new Pane({
         title: 'Parameters',
         container: document.getElementById(div),
     })
+
+    pane.registerPlugin(EssentialsPlugin)
+    // pane.registerPlugin(TWFile)
 
     const PARAMS = {
         speed: 0.5,
