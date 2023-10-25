@@ -97,6 +97,23 @@ export class CostDomain {
         this.generate()
     }
 
+    /**
+     * 
+     * @param name A name in the parameter space (aka, introspection)
+     * @param value The value
+     */
+    setParameter(name: string, value: number) {
+        if (hasOwn(this.space, name) === false) {
+            throw `parameter-space does not have property named ${name}`
+        }
+
+        // this.space.R = value
+        // this.space.psi = value
+        // ...
+        this.space[name] = value
+        this.generate()
+    }
+
     setData(data: Data[]) {
         this.space.setData(data)
     }
@@ -104,48 +121,6 @@ export class CostDomain {
     generate() {
         const z = this.domain.run()
         console.log(minMaxArray(z))
-
-        // ----------------------------------------------------------------------
-        if (0) {
-            // Generate the triangulated surface
-            const x = this.domain.x()
-            const y = this.domain.y()
-            const z = new Array(x.length).fill(0)
-            const positions = Serie.create({ array: array.flatten([x, y, z]), itemSize: 3 })
-            const df = triangulate(positions)
-            const pos = df.series['positions']
-            const idx = df.series['indices']
-
-            const n = 50
-
-            // interpolate into a regular grid
-            const inter = new InterpolateInGrid2D({
-                positions: pos,
-                indices: idx,
-                attribute: Serie.create({array: z, itemSize: 1}),
-                nx: n,
-                ny: n,
-                flatten: true
-            })
-
-            const values = []
-            for (let i=0; i<n; ++i) {
-                const I = i/(n-1)
-                for (let j=0; j<n; ++j) {
-                    const J = j/(n-1)
-                    values.push(inter.interpolate([I,J]))
-                }
-            }
-
-            doDomain({
-                div: 'isoDiv',
-                width: 1000,
-                n: n,
-                m: n,
-                values
-            })
-        }
-        // ----------------------------------------------------------------------
 
         scatterPlot({
             div: this.div,

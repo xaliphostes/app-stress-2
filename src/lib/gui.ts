@@ -3,6 +3,8 @@ import * as EssentialsPlugin from '@tweakpane/plugin-essentials'
 import { parameters } from "./parameters"
 import { domainBouds } from "./CostDomain"
 import { colorTables } from "./colorTables"
+import { AxeSwitcher } from "./AxeSwitcher"
+import { Bounds } from "../../../stress/src/lib"
 
 export function createGUI(div: string) {
 
@@ -74,7 +76,22 @@ export function createGUI(div: string) {
         const domai = pane.addFolder({
             title: 'Domain',
         })
-        let list = domai.addBlade({
+
+        let x = undefined
+        let y = undefined
+        let sx = undefined
+        let sy = undefined
+        const switcher = new AxeSwitcher()
+
+        function changeSlider(s: SliderBladeApi, axisName: string, label: string) {
+            s.label = label
+            s.min = domainBouds[axisName][0]
+            s.max = domainBouds[axisName][1]
+        }
+
+        // ----------------------------------------
+
+        x = domai.addBlade({
             view: 'list',
             label: 'X axis',
             options: [
@@ -85,14 +102,26 @@ export function createGUI(div: string) {
             ],
             value: 'R',
         }) as ListBladeApi<string>
-        list.on('change', (e) => {
+        x.on('change', (e) => {
             const axisName = e.value
             if (domain.axis('y').name !== axisName) {
-                domain.changeAxis('x', axisName, domainBouds[axisName])
+                if (switcher.setX(axisName)) {
+                    domain.changeAxis('x', axisName, domainBouds[axisName])
+                    changeSlider(sx, switcher.sx, switcher.getSx())
+                    changeSlider(sy, switcher.sy, switcher.getSy())
+                }
+                else {
+                    x.value = switcher.x
+                }
+            }
+            else {
+                x.value = switcher.x
             }
         })
 
-        list = domai.addBlade({
+        // ----------------------------------------
+
+        y = domai.addBlade({
             view: 'list',
             label: 'Y axis',
             options: [
@@ -103,14 +132,68 @@ export function createGUI(div: string) {
             ],
             value: 'theta'
         }) as ListBladeApi<string>
-        list.on('change', (e) => {
+        y.on('change', (e) => {
             const axisName = e.value
             if (domain.axis('x').name !== axisName) {
-                domain.changeAxis('y', axisName, domainBouds[axisName])
+                if (switcher.setY(axisName)) {
+                    domain.changeAxis('y', axisName, domainBouds[axisName])
+                    changeSlider(sx, switcher.sx, switcher.getSx())
+                    changeSlider(sy, switcher.sy, switcher.getSy())
+                }
+                else {
+                    y.value = switcher.y
+                }
+            }
+            else {
+                y.value = switcher.y
             }
         })
 
-        const slider = domai.addBlade({
+        // ----------------------------------------
+
+        sx = domai.addBlade({
+            view: 'slider',
+            label: 'ψ',
+            min: 0,
+            max: 180,
+            step: 1,
+            value: 0,
+        }) as SliderBladeApi
+        sx.on('change', (e) => {
+            domain.setParameter(switcher.sx, e.value)
+        })
+
+        // ----------------------------------------
+
+        sy = domai.addBlade({
+            view: 'slider',
+            label: 'φ',
+            min: 0,
+            max: 180,
+            step: 1,
+            value: 0,
+        }) as SliderBladeApi
+        sy.on('change', (e) => {
+            domain.setParameter(switcher.sy, e.value)
+        })
+
+        domai.addBlade({
+            view: 'separator',
+        });
+
+        domai.addButton({
+            title: 'Generate domain'
+        }).on('click', () => model.updateDomain())
+
+        // ----------------------------------------
+
+        const domaiFolder = domai.addFolder({
+            title: 'Visu',
+        })
+
+        // ----------------------------------------
+
+        const slider = domaiFolder.addBlade({
             view: 'slider',
             label: 'Sampling',
             min: 100,
@@ -122,7 +205,9 @@ export function createGUI(div: string) {
             domain.changeSampling(e.value)
         })
 
-        const slider2 = domai.addBlade({
+        // ----------------------------------------
+
+        const slider2 = domaiFolder.addBlade({
             view: 'slider',
             label: 'Point size',
             min: 1,
@@ -134,10 +219,12 @@ export function createGUI(div: string) {
             domain.changeMarkerSize(e.value)
         })
 
-        const colorScales = domai.addBlade({
+        // ----------------------------------------
+
+        const colorScales = domaiFolder.addBlade({
             view: 'list',
             label: 'Color table',
-            options: colorTables.map( name => {
+            options: colorTables.map(name => {
                 return {
                     text: name,
                     value: name
@@ -149,10 +236,9 @@ export function createGUI(div: string) {
             domain.changeColorScale(e.value)
         })
 
-        domai.addButton({
-            title: 'Generate domain'
-        }).on('click', () => model.updateDomain())
+        domaiFolder.expanded = false
     }
+
     // -------------------------------------
     //          Domains
     // -------------------------------------
@@ -188,7 +274,7 @@ export function createGUI(div: string) {
         const colorScales = domai.addBlade({
             view: 'list',
             label: 'Color table',
-            options: colorTables.map( name => {
+            options: colorTables.map(name => {
                 return {
                     text: name,
                     value: name
@@ -203,6 +289,8 @@ export function createGUI(div: string) {
         domai.addButton({
             title: 'Generate domain'
         }).on('click', () => model.updateDomains())
+
+        domai.expanded = false
     }
 
     // -------------------------------------
@@ -220,4 +308,6 @@ export function createGUI(div: string) {
     }) as SliderBladeApi
     h.on('change', (e) => {
     })
+
+    histo.expanded = false
 }
