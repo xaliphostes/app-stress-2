@@ -1,9 +1,9 @@
-import Plotly from 'plotly.js'
+// import Plotly from 'plotly.js' // !!!!!!!!! DOES not work
+import Plotly from 'plotly.js/dist/plotly'
 
 export function doDomain(
     { div, width, n, m, values }:
-    { div: string, width: number, n: number, m: number, values: number[] })
-{
+        { div: string, width: number, n: number, m: number, values: number[] }) {
     const size = n
     const x = new Array(size)
     const y = new Array(size)
@@ -44,8 +44,8 @@ export function doDomain(
         plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
         height: 500,
         xaxis: {
-            // scaleanchor: 'y',
-            // constrain: "domain",
+            scaleanchor: 'y',
+            constrain: "domain",
             title: {
                 text: 'R',
                 font: {

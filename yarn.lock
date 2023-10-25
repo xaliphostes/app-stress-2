@@ -1212,10 +1212,27 @@
   resolved "https://registry.npmjs.org/@xtuc/long/-/long-4.2.2.tgz"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@youwol/dataframe@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@youwol/dataframe/-/dataframe-0.1.0.tgz#b32382ad2fb22c6234956eb495df2051c59158a1"
+  integrity sha512-wxtVV2aocLWTurRYauTDd6RYmpBPapccgGJRjWtUJnrp+gff6O4MgwPhFcTN72SMiMWX8dfB5gHF0Rsx5nxLkg==
+
 "@youwol/eslint-config@^0.0.4":
   version "0.0.4"
   resolved "https://registry.npmjs.org/@youwol/eslint-config/-/eslint-config-0.0.4.tgz"
   integrity sha512-TdsslNgIeh/zOw/h20FNK7I8TW67YrIc0doNzodVyM0agUsHQbxvUKZt590DqVJ03UTDsGR3xSEu3ivkDmZzEw==
+
+"@youwol/geometry@^0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@youwol/geometry/-/geometry-0.0.23.tgz#c9d4989537d8c34cafb02c5f9a6d079f1d654293"
+  integrity sha512-NvpOR8VyZLw3+Q/8bQbKjxeCDlkGs3czROU55o+3kTsuM+vOgrZjiRUzQEpLoJFfGj1JNa3RCjV55fUjNsSJ8Q==
+
+"@youwol/math@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@youwol/math/-/math-0.1.0.tgz#e44752bc0203195903d60b260129407e4c2ada4b"
+  integrity sha512-FVsU9qhdaTJ2c3D0UILneowdBP88/Ck+jl1ybEoMonWoqvi/PFvQvzxNp9+gIe80BTfw2XnZ5IljAvI+ZJalqg==
+  dependencies:
+    "@youwol/dataframe" "^0.1.0"
 
 "@youwol/prettier-config@^0.0.2":
   version "0.0.2"

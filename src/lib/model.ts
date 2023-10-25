@@ -1,15 +1,30 @@
-import {
-    trimAll, DataFactory, Data,
-    InverseMethod, displayMatrix3x3
-}
-from '../../../stress/src/lib/'
-// from '../../libs/stress' // '../../../stress/src/lib/utils/trimAlls'
+import { trimAll, DataFactory, Data, InverseMethod, MisfitCriteriunSolution } from '../../../stress/src/lib'
+import { parameters } from './parameters'
 
 export class Model {
-    private data: Data[] = []
+    private inv: InverseMethod = undefined
+    // private domain: CostDomain = undefined
 
-    addData(arrayBuffer: ArrayBuffer) {
-        const lines = new TextDecoder().decode(arrayBuffer).split('\n')
+    constructor() {
+        this.inv = new InverseMethod()
+        // this.domain = new CostDomain({div: 'divDomain', engine: this.inv.engine})
+    }
+
+    get engine() {
+        return this.inv.engine
+    }
+
+    addData(data: Data[]) {
+        this.inv.addData(data)
+    }
+
+    addDataFromBuffer(arrayBuffer: ArrayBuffer) {
+        let buffer = new TextDecoder().decode(arrayBuffer)
+        const lines = buffer.split('\n')
+        buffer = buffer.substring(buffer.indexOf('\n') + 1)
+
+        let ok = true
+        const datas: Data[] = []
 
         for (let i = 1; i < lines.length; ++i) {
             const line = trimAll(lines[i].trim())
@@ -23,65 +38,98 @@ export class Model {
             }
 
             const data = DataFactory.create(toks[1])
+
             if (data === undefined) {
-                alert(`Unknown data type "${toks[1]}" for data id ${toks[0]}`)
+                document.getElementById("info").innerHTML = `<p>Unknown data type "${toks[1]}" for data id ${toks[0]}</p>
+                <br>
+                Original file:
+                <textarea style="width: 100%" cols="50" rows="10" class="numbered">${buffer}</textarea>`
                 continue
             }
 
             const result = data.initialize([toks])
             if (result.status === false) {
-                result.messages.forEach(msg => console.log(msg))
-                alert('An error occured. Read the console.')
+                ok = false
+                let t = ''
+                result.messages.forEach((msg: string) => t += `<p>${msg}</p>`)
+                document.getElementById("info").innerHTML = t
             }
             else {
-                this.data.push(data)
+                datas.push(data)
             }
         }
 
-        console.log(this.data)
+        if (ok) {
+            document.getElementById("logs").innerHTML = `<p>Loaded ${datas.length} data</p>`
+            this.addData(datas) // i.e., in this.inv
+            parameters.domain.setData(datas)
+            parameters.domains.setData(datas)
+        }
     }
 
     run() {
-        const inv = new InverseMethod()
-        inv.addData(this.data)
-        const r = inv.run()
+        this.displayResults(this.inv.run())
+    }
 
-        const stress = r.stressTensorSolution
+    updateDomain() {
+        parameters.domain.generate()
+    }
 
-        const info = document.getElementById("info")
-
-
-        const t = `
-        <table>
-            <thead>
-            <tr>
-                <th colspan="2">Inversion results</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Misfit</td>
-                <td>${r.misfit}</td>
-            </tr>
-            <tr>
-                <td>R</td>
-                <td>${r.stressRatio}</td>
-            </tr>
-            </tbody>
-        </table>`
-
-        info.innerHTML = t
-        
-        // `Misfit: ${r.misfit}<br>
-        //     R: ${r.stressRatio}<br>
-        //     Stress tensor:<br>
-        //     ${stress[0][0].toFixed(3)} ${stress[0][1].toFixed(3)} ${stress[0][2].toFixed(3)}<br>
-        //     ${stress[1][0].toFixed(3)} ${stress[1][1].toFixed(3)} ${stress[1][2].toFixed(3)}<br>
-        //     ${stress[2][0].toFixed(3)} ${stress[2][1].toFixed(3)} ${stress[2][2].toFixed(3)}<br>`
+    updateDomains() {
+        parameters.domains.generate()
     }
 
     clear() {
         console.log('clearing the model')
-        this.data = []
+        this.inv.clearData()
+    }
+
+    displayResults(solution: MisfitCriteriunSolution) {
+        const stress = solution.stressTensorSolution
+
+        document.getElementById("info").innerHTML = `<div>
+            <center><h3>Inversion results</h3></center>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Misfit</td>
+                        <td><code>${solution.misfit.toFixed(2)} </code></td>
+                    </tr>
+                    <tr>
+                        <td>R</td>
+                        <td><code>${solution.stressRatio.toFixed(2)}</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <div>
+                <math>
+                    <mrow>
+                        <mo>&sigma; =</mo>
+                        <mo>[</mo>
+                        <mtable>
+                            <mtr>
+                                <mtd><mn>${stress[0][0].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[0][1].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[0][2].toFixed(3)}</mn></mtd>
+                            </mtr>
+                            
+                            <mtr>
+                                <mtd><mn>${stress[1][0].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[1][1].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[1][2].toFixed(3)}</mn></mtd>
+                            </mtr>
+                            
+                            <mtr>
+                                <mtd><mn>${stress[2][0].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[2][1].toFixed(3)}</mn></mtd>
+                                <mtd><mn>${stress[2][2].toFixed(3)}</mn></mtd>
+                            </mtr>
+                        </mtable>
+                        <mo>]</mo>
+                    </mrow>
+                </math>
+            </div>
+        </div>`
     }
 }

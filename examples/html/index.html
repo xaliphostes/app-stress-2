@@ -26,7 +26,6 @@
 <body>
     <!-- Modal -->
     <div id="myModal" class="modal">
-
         <!-- Modal content -->
         <div class="modal-content">
             <div class="modal-header">
@@ -34,20 +33,16 @@
                 <h2>Help</h2>
             </div>
             <div class="modal-body">
-                <p>Some text in the Modal Body</p>
-                <p>Some other text...</p>
+                <p>Help about this program</p>
+                <p>To be done...</p>
             </div>
-            <!-- <div class="modal-footer">
-                <h3>Modal Footer</h3>
-            </div> -->
         </div>
-
     </div>
 
     <div class="navbar">
         <span style="font-size:30px;cursor:pointer; color: white; margin-left: 5px;" onclick="openNav()"
             id="mainMenu">&#9776;</span>
-            <h3 style="color: white;">Stress Fault</h3>
+        <h3 style="color: white;">Stress Fault</h3>
         <button type="button" class="btn btn-primary" data-toggle="modal" id="myBtn"
             style="margin-left: 5px; margin-right: 5px;">
             Help
@@ -61,19 +56,19 @@
     </div>
 
     <div id="main" style="margin-top: 50px;">
-        <!-- <span style="font-size:30px;cursor:pointer;" onclick="openNav()" id="mainMenu">&#9776;</span> -->
-        <div class="container">
+        <div class="container" style="width: 100%;">
             <div class="row align-items-start">
                 <div id="console"
                     style="left:0%; border: 2px solid #000000; padding-bottom: 10px; border-radius: 5px;margin-top: 0px; background-color: rgb(232, 232, 232);">
-                    <center>
-                        <p id="title"><strong>Results</strong></p>
-                    </center>
                     <p id="info"></p>
                 </div>
                 <div>
                     <center>
+                        <div id="isoDiv" style="margin-top: 5px;">
+                        </div>
                         <div id="domainDiv" style="margin-top: 5px;">
+                        </div>
+                        <div id="domainsDiv" style="margin-top: 5px;">
                         </div>
                         <div id="histogramDiv" style="margin-top: 5px;">
                         </div>
@@ -81,154 +76,22 @@
                 </div>
             </div>
         </div>
+        <footer class="panel panel-default" id="logs" style="visibility: hidden">
+            <p>Logs...</p>
+        </footer>
     </div>
+
+    <a href="http://www.gm.univ-montp2.fr" target="_blank">
+        <img src="../../media/geosciences.png" width="150px" alt="http://www.gm.univ-montp2.fr/"
+            style="position: absolute; right: 10px;bottom: 30px; opacity: 70%;" />
+    </a>
+
 
     <input id="upload" type="file" style="visibility: hidden" />
 
     <script>
+        let oldConsole = undefined
 
-        /*
-        function generateRandomDomain(n) {
-            const r = []
-            const d = 8
-            for (let i = 0.; i < n; ++i) {
-                const x = i / n * d
-                for (let j = 0.; j < n; ++j) {
-                    const y = j / n * d
-                    r.push(Math.sin(x) * Math.cos(y) ** 2)
-                }
-            }
-            return r
-        }
-
-        function doDomain(
-            { div, width, n, m, values }) {
-            const size = n
-            const x = new Array(size)
-            const y = new Array(size)
-            const z = new Array(size)
-
-            for (let i = 0; i < size; i++) {
-                x[i] = y[i] = i / (n - 1)
-                z[i] = new Array(size)
-            }
-
-            let k = 0
-            for (let i = 0; i < size; i++) {
-                for (let j = 0; j < size; j++) {
-                    z[i][j] = values[k++]
-                }
-            }
-
-            const data = [{
-                z: z,
-                x: x,
-                y: y,
-                type: 'contour',
-                colorbar: {
-                    thickness: 30,
-                    title: 'Cost',
-                    titleside: 'right',
-                    titlefont: {
-                        size: 14,
-                        family: 'Arial, sans-serif'
-                    }
-                }
-            }]
-
-            const layout = {
-                title: 'Domain',
-                paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
-                plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
-                height: 500,
-                xaxis: {
-                    scaleanchor: 'y',
-                    constrain: "domain",
-                    title: {
-                        text: 'R',
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 18,
-                            color: '#000000'
-                        }
-                    },
-                },
-                yaxis: {
-                    title: {
-                        text: 'Theta',
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 18,
-                            color: '#000000'
-                        }
-                    }
-                }
-            }
-
-            const config = { responsive: true }
-
-            Plotly.newPlot(div, data, layout, config)
-
-            const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
-            observer.observe(document.getElementById(div))
-        }
-
-        function doHistogram({ div, values, nbBins = 10 }) {
-            const trace = {
-                xbins: { size: (1 - 0) / (nbBins - 1), start: 0, end: 1 },
-                x: values,
-                type: 'histogram',
-                // text: [1,2,3],
-                marker: {
-                    color: 'rgb(158,202,225)',
-                    opacity: 0.6,
-                    line: {
-                        color: 'rgb(8,48,107)',
-                        width: 1.5
-                    }
-                }
-            }
-            const layout = {
-                bargap: 5,
-                title: 'Histogram',
-                paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
-                plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
-                // height: 500,
-                width: 500,
-                xaxis: {
-                    // scaleanchor: 'y',
-                    // constrain: "domain",
-                    title: {
-                        text: 'Angular misfit',
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 18,
-                            color: '#000000'
-                        }
-                    },
-                },
-                yaxis: {
-                    title: {
-                        text: 'Nb of data',
-                        font: {
-                            family: 'Courier New, monospace',
-                            size: 18,
-                            color: '#000000'
-                        }
-                    }
-                }
-            }
-
-            Plotly.newPlot(div, [trace], layout)
-
-            const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
-            observer.observe(document.getElementById(div))
-        }
-        */
-
-    </script>
-
-    <script>
         function openNav() {
             const w = 300
             document.getElementById("mySidenav").style.width = `${w}px`
@@ -269,39 +132,44 @@
                 }
             }
         }
+
+        function redirectConsole() {
+            if (!console) {
+                console = {}
+            }
+            oldConsole = console.log
+            const logger = document.getElementById('logs')
+            console.log = (message) => {
+                if (typeof message == 'object') {
+                    logger.innerHTML = (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '<br />'
+                } else {
+                    logger.innerHTML = message + '<br />'
+                }
+            }
+        }
+
+        function setupKeys() {
+            // ESC key for the navbar
+            $(document).keyup(e => {
+                if (e.keyCode === 27) {
+                    const w = document.getElementById("mySidenav").style.width
+                    if (w === '0px') {
+                        openNav()
+                    }
+                    else {
+                        closeNav()
+                    }
+                }
+            })
+        }
     </script>
 
     <script type="module">
         const gui = window['@alfredicus/app-stress-2']
 
-        // ESC key for the navbar
-        $(document).keyup(e => {
-            if (e.keyCode === 27) {
-                const w = document.getElementById("mySidenav").style.width
-                if (w === '0px') {
-                    openNav()
-                }
-                else {
-                    closeNav()
-                }
-            }
-        })
-
         setupHelp()
-
-        /*
-        doDomain({
-            div: 'domainDiv',
-            n: 50,
-            values: generateRandomDomain(50)
-        })
-
-        doHistogram({
-            div: 'histogramDiv',
-            values: new Array(50).fill(0).map(_ => Math.random())
-        })
-        */
-
+        setupKeys()
+        openNav()
         gui.createGUI('gui')
     </script>
 </body>

@@ -1,6 +1,9 @@
-import { Model } from './model'
-
 export * from './gui'
-export * from './model'
+export * from './Model'
+export * from './scatterPlot'
+export * from './scatterSubPlots'
+export * from './doDomain'
+export * from './CostDomain'
+export * from './CostDomains'
 
-export const model = new Model()
+export * from './parameters'
