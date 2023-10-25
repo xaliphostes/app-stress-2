@@ -1,14 +1,21 @@
-import { Pane } from "tweakpane"
+import { ListBladeApi, Pane, SliderBladeApi } from "tweakpane"
 import * as EssentialsPlugin from '@tweakpane/plugin-essentials'
-import { model } from "."
+import { parameters } from "./parameters"
+import { domainBouds } from "./CostDomain"
+import { colorTables } from "./colorTables"
 
 export function createGUI(div: string) {
+
+    const model = parameters.model
+    const domain = parameters.domain
+    const domains = parameters.domains
+
     // ---------------------------------------------------------------------------------
     {
         const upload = document.getElementById('upload') as HTMLInputElement
         upload.onchange = () => {
             upload.files[0].arrayBuffer().then(arrayBuffer => {
-                model.addData(arrayBuffer)
+                model.addDataFromBuffer(arrayBuffer)
             })
         }
     }
@@ -18,92 +25,199 @@ export function createGUI(div: string) {
         title: 'Parameters',
         container: document.getElementById(div),
     })
-
     pane.registerPlugin(EssentialsPlugin)
 
-    pane.addButton({
-        title: 'Upload data',
-    }).on('click', () => document.getElementById('upload').click())
+    // -------------------------------------
+    //          Data
+    // -------------------------------------
 
-    pane.addButton({
+    const datas = pane.addFolder({
+        title: 'Data',
+    })
+    datas.addButton({
+        title: 'Upload data',
+    }).on('click', () => document.getElementById('upload').click()) // simulate a click
+
+    datas.addButton({
+        title: 'Info'
+    }).on('click', () => {
+    })
+
+    datas.addButton({
         title: 'Clear'
     }).on('click', () => model.clear())
 
-    pane.addBlade({view: 'separator'})
+    // -------------------------------------
+    //          Simulation
+    // -------------------------------------
 
-    pane.addButton({
+    const simulation = pane.addFolder({
+        title: 'Simulation',
+    })
+    simulation.addBlade({
+        view: 'slider',
+        label: 'Iterations',
+        min: 100,
+        max: 100000,
+        value: 1000,
+    })
+    simulation.addButton({
         title: 'Run'
     }).on('click', () => model.run())
 
-    /*
-    const PARAMS = {
-        speed: 0.5,
-        quality: 0,
-        k: 0,
-        theme: '',
-        hidden: true,
-        background: { r: 255, g: 0, b: 55 },
-        key: '#ff0055ff',
-        offset: { x: 50, y: 25 },
-        camera: { x: 0, y: 20, z: -10 },
-        color: { x: 0, y: 0, z: 0, w: 1 },
-        text: "0" // readonly
+
+    // -------------------------------------
+    //          Domain
+    // -------------------------------------
+
+    {
+        const domai = pane.addFolder({
+            title: 'Domain',
+        })
+        let list = domai.addBlade({
+            view: 'list',
+            label: 'X axis',
+            options: [
+                { text: 'R', value: 'R' },
+                { text: 'ψ', value: 'psi' },
+                { text: 'θ', value: 'theta' },
+                { text: 'φ', value: 'phi' }
+            ],
+            value: 'R',
+        }) as ListBladeApi<string>
+        list.on('change', (e) => {
+            const axisName = e.value
+            if (domain.axis('y').name !== axisName) {
+                domain.changeAxis('x', axisName, domainBouds[axisName])
+            }
+        })
+
+        list = domai.addBlade({
+            view: 'list',
+            label: 'Y axis',
+            options: [
+                { text: 'R', value: 'R' },
+                { text: 'ψ', value: 'psi' },
+                { text: 'θ', value: 'theta' },
+                { text: 'φ', value: 'phi' }
+            ],
+            value: 'theta'
+        }) as ListBladeApi<string>
+        list.on('change', (e) => {
+            const axisName = e.value
+            if (domain.axis('x').name !== axisName) {
+                domain.changeAxis('y', axisName, domainBouds[axisName])
+            }
+        })
+
+        const slider = domai.addBlade({
+            view: 'slider',
+            label: 'Sampling',
+            min: 100,
+            max: 10000,
+            step: 1,
+            value: 1000,
+        }) as SliderBladeApi
+        slider.on('change', (e) => {
+            domain.changeSampling(e.value)
+        })
+
+        const slider2 = domai.addBlade({
+            view: 'slider',
+            label: 'Point size',
+            min: 1,
+            max: 10,
+            step: 1,
+            value: 5,
+        }) as SliderBladeApi
+        slider2.on('change', (e) => {
+            domain.changeMarkerSize(e.value)
+        })
+
+        const colorScales = domai.addBlade({
+            view: 'list',
+            label: 'Color table',
+            options: colorTables.map( name => {
+                return {
+                    text: name,
+                    value: name
+                }
+            }),
+            value: 'Portland'
+        }) as ListBladeApi<string>
+        colorScales.on('change', (e) => {
+            domain.changeColorScale(e.value)
+        })
+
+        domai.addButton({
+            title: 'Generate domain'
+        }).on('click', () => model.updateDomain())
+    }
+    // -------------------------------------
+    //          Domains
+    // -------------------------------------
+
+    {
+        const domai = pane.addFolder({
+            title: 'Domains',
+        })
+        const slider = domai.addBlade({
+            view: 'slider',
+            label: 'Sampling',
+            min: 100,
+            max: 10000,
+            step: 1,
+            value: 1000,
+        }) as SliderBladeApi
+        slider.on('change', (e) => {
+            domains.changeSampling(e.value)
+        })
+
+        const slider2 = domai.addBlade({
+            view: 'slider',
+            label: 'Point size',
+            min: 1,
+            max: 10,
+            step: 1,
+            value: 5,
+        }) as SliderBladeApi
+        slider2.on('change', (e) => {
+            domains.changeMarkerSize(e.value)
+        })
+
+        const colorScales = domai.addBlade({
+            view: 'list',
+            label: 'Color table',
+            options: colorTables.map( name => {
+                return {
+                    text: name,
+                    value: name
+                }
+            }),
+            value: 'Portland'
+        }) as ListBladeApi<string>
+        colorScales.on('change', (e) => {
+            domains.changeColorScale(e.value)
+        })
+
+        domai.addButton({
+            title: 'Generate domain'
+        }).on('click', () => model.updateDomains())
     }
 
-    pane.addBinding(PARAMS, 'speed')
-    pane.addBinding(PARAMS, 'speed', { min: 0, max: 100, })
-    pane.addBinding(PARAMS, 'quality', {
-        options: {
-            low: 0,
-            medium: 50,
-            high: 100,
-        },
+    // -------------------------------------
+    //          Histogram...
+    // -------------------------------------
+    const histo = pane.addFolder({
+        title: 'Histogram',
     })
-    pane.addBinding(PARAMS, 'k', {
-        format: (v) => v.toFixed(6),
+    const h = histo.addBlade({
+        view: 'slider',
+        label: 'Nb bins',
+        min: 2,
+        max: 20,
+        value: 10
+    }) as SliderBladeApi
+    h.on('change', (e) => {
     })
-    pane.addBinding(PARAMS, 'theme', {
-        options: {
-            none: '',
-            dark: 'dark-theme.json',
-            light: 'light-theme.json',
-        },
-    })
-    pane.addBinding(PARAMS, 'hidden')
-    pane.addBinding(PARAMS, 'background')
-    pane.addBinding(PARAMS, 'key', {
-        picker: 'inline',
-        expanded: true,
-    })
-    pane.addBinding(PARAMS, 'offset')
-    pane.addBinding(PARAMS, 'camera', {
-        y: { step: 10 },
-        z: { max: 0 },
-    })
-    pane.addBinding(PARAMS, 'color', {
-        x: { min: 0, max: 1 },
-        y: { min: 0, max: 1 },
-        z: { min: 0, max: 1 },
-        w: { min: 0, max: 1 },
-    })
-
-    const f1 = pane.addFolder({
-        title: 'More',
-    })
-
-    const btn = f1.addButton({
-        title: 'Increment',
-        label: 'counter',   // optional
-    })
-    let count = 0
-
-    btn.on('click', () => {
-        count += 1;
-        PARAMS.text = count.toString()
-    })
-
-    pane.addBinding(PARAMS, 'text', {
-        readonly: true,
-    })
-    */
 }

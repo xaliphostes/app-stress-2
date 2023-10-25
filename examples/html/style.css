@@ -52,7 +52,8 @@ body {
 
 #main {
     transition: margin-left .5s;
-    padding: 16px;
+    /* padding: 16px; */
+    padding-top: 16px;
 }
 
 @media screen and (max-height: 450px) {
@@ -163,14 +164,81 @@ body {
 
 /* ------------------------------------------------ */
 
-table,
-td {
-    border: 1px solid #000000;
+table {
+    border: 2px solid #000000;
+    margin-top: 20px;
 }
+
+td {
+    border: 2px solid #000000;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 
 thead,
 tfoot {
-    background-color: #cdd5a1;
     color: #000000;
     justify-content: center;
 }
+
+.matrix {
+    position: relative;
+}
+
+/* body {
+    padding: 20px;
+} */
+
+.matrix:before,
+.matrix:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    border: 1px solid #000;
+    width: 6px;
+    height: 100%;
+}
+
+.matrix:before {
+    left: -6px;
+    border-right: 0px;
+}
+
+.matrix:after {
+    right: -6px;
+    border-left: 0px;
+}
+
+.matrix td {
+    padding: 5px;
+    text-align: center;
+}
+
+/* -------------------------------------------- */
+
+textarea.numbered {
+    background: gray;
+    background-attachment: local;
+    background-repeat: no-repeat;
+    padding-left: 35px;
+    padding-top: 10px;
+    border-color: #ccc;
+}
+
+/* -------------------------------------------- */
+
+footer {
+    text-align: left;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    padding-left: 5px;
+
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    /* margin: 0px; */
+    height: 30px;
+    /* border: 2px;
+    border-color: white; */
+  }
