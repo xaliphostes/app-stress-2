@@ -64,6 +64,7 @@ export class Model {
             this.addData(datas) // i.e., in this.inv
             parameters.domain.setData(datas)
             parameters.domains.setData(datas)
+            parameters.domain3D.setData(datas)
         }
     }
 

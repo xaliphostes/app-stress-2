@@ -1,31 +1,26 @@
-// import Plotly from 'plotly.js' // !!!!!!!!! DOES not work
+// import Plotly from 'plotly.js' // !!!!!!!!! DOES not work. Use the following line instead.
 import Plotly from 'plotly.js/dist/plotly'
+import { Domain } from '../../../stress/src/lib'
 
 export function doDomain(
-    { div, width, n, m, values }:
-        { div: string, width: number, n: number, m: number, values: number[] }) {
-    const size = n
-    const x = new Array(size)
-    const y = new Array(size)
-    const z = new Array(size)
-
-    for (let i = 0; i < size; i++) {
-        x[i] = y[i] = i / (n - 1)
-        z[i] = new Array(size)
-    }
+    { div, x, y, data, domain, width = 500, height = 500, markerSize = 5, colorScale = 'Portland', zmin = 0, zmax = 2, spacing = 0.1 }:
+        { div: string, x: number[], y: number[], data: number[], domain: Domain, width?: number, height?: number, markerSize?: number, colorScale?: string, zmin?: number, zmax?: number, spacing?: number }) {
+    const z = new Array(x.length)
 
     let k = 0
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            z[i][j] = values[k++]
+    for (let i = 0; i < x.length; i++) {
+        z[i] = new Array(y.length)
+        for (let j = 0; j < y.length; j++) {
+            const v = data[k++]
+            z[i][j] = v // v > 1.5 ? Number.NaN : v
         }
     }
 
-    const data = [{
-        z: z,
+    const trace = {
         x: x,
         y: y,
-        type: 'contour',
+        z,
+        type: 'contour', // 'contourcarpet'
         colorbar: {
             thickness: 30,
             title: 'Cost',
@@ -34,20 +29,29 @@ export function doDomain(
                 size: 14,
                 family: 'Arial, sans-serif'
             }
-        }
+        },
+        colorscale: colorScale,
+        // zmin,
+        // zmax,
+        contours: {
+            start: zmin,
+            end: zmax,
+            size: spacing
+          }
     } as Partial<Plotly.PlotData>
-    ];
 
     const layout = {
         title: 'Domain',
-        paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
-        plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
-        height: 500,
+        // paper_bgcolor: "rgba(0,0,0,0", //background color of the chart container space
+        // plot_bgcolor: "rgba(0,0,0,0)", //background color of plot area
+        width: width,
+        height: height,
         xaxis: {
-            scaleanchor: 'y',
+            // scaleanchor: 'y',
             constrain: "domain",
+            // range: domain.xAxis().bounds,
             title: {
-                text: 'R',
+                text: domain.xAxis().name,
                 font: {
                     family: 'Courier New, monospace',
                     size: 18,
@@ -56,8 +60,10 @@ export function doDomain(
             },
         },
         yaxis: {
+            scaleanchor: 'x',
+            // range: domain.yAxis().bounds,
             title: {
-                text: 'Theta',
+                text: domain.yAxis().name,
                 font: {
                     family: 'Courier New, monospace',
                     size: 18,
@@ -67,9 +73,7 @@ export function doDomain(
         }
     }
 
-    const config = { responsive: true }
-
-    Plotly.newPlot(div, data, layout, config)
+    Plotly.newPlot(div, [trace], layout, { responsive: true })
 
     const observer = new ResizeObserver(_ => Plotly.Plots.resize(document.getElementById(div)))
     observer.observe(document.getElementById(div))
