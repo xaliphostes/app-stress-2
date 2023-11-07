@@ -90,6 +90,11 @@ export function createGUI(div: string) {
             title: 'Domain',
         })
 
+        const TEST = {
+            show: true
+        }
+        domainFolder.addBinding(TEST, 'show')
+
         let x = undefined
         let y = undefined
         let sx = undefined

@@ -1,3 +1,4 @@
+import { eigen, eigenVector } from '@youwol/math'
 import { trimAll, DataFactory, Data, InverseMethod, MisfitCriteriunSolution } from '../../../stress/src/lib'
 import { parameters } from './parameters'
 
@@ -86,10 +87,19 @@ export class Model {
     }
 
     displayResults(solution: MisfitCriteriunSolution) {
+        this.inv.engine.setHypotheticalStress(solution.rotationMatrixW, solution.stressRatio)
+        const s = this.inv.engine.stress([0,0,0])
+        let misfitAngles = "<ol>"
+        this.inv.data.forEach( d => {
+            misfitAngles += `<li>${(d.predict({stress: s})*180/Math.PI).toFixed(1)}°`
+        })
+        misfitAngles += "</ol>"
+
         const stress = solution.stressTensorSolution
+        const eig = eigen([stress[0][0], stress[0][1], stress[0][2], stress[1][1], stress[1][2], stress[2][2]])
 
         document.getElementById("info").innerHTML = `<div>
-            <center><h3>Inversion results</h3></center>
+            <h3>Inversion results</h3>
             <table>
                 <tbody>
                     <tr>
@@ -131,6 +141,21 @@ export class Model {
                     </mrow>
                 </math>
             </div>
+            <br>
+            &sigma;1 = [${eig.vectors[0].toFixed(3)}, ${eig.vectors[1].toFixed(3)}, ${eig.vectors[2].toFixed(3)}]
+            <br>
+            &sigma;2 = [${eig.vectors[3].toFixed(3)}, ${eig.vectors[4].toFixed(3)}, ${eig.vectors[5].toFixed(3)}]
+            <br>
+            &sigma;3 = [${eig.vectors[6].toFixed(3)}, ${eig.vectors[7].toFixed(3)}, ${eig.vectors[8].toFixed(3)}]
+            <br><br>
+            &sigma;1 = [${eig.values[0].toFixed(3)}]
+            <br>
+            &sigma;2 = [${eig.values[1].toFixed(3)}]
+            <br>
+            &sigma;3 = [${eig.values[2].toFixed(3)}]
+            <br><br>
+            <h3>Data misfit angles:</h3>
+            ${misfitAngles}
         </div>`
     }
 }
