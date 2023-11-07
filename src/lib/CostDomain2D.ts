@@ -30,7 +30,7 @@ export class CostDomain {
     private regular = true
     zmin = 0
     zmax = 2
-    spacing = 0.1
+    spacing_ = 0.1
     private min_ = 0
     private max_ = 2
 
@@ -90,6 +90,10 @@ export class CostDomain {
     }
     set max(v: number) {
         // nothing
+    }
+
+    set nbr(v: number) {
+        this.spacing_ = (this.max_ - this.min_) / v
     }
 
     changeSampling(n: number) {
@@ -175,14 +179,14 @@ export class CostDomain {
         if (this.regular) {
             doDomain({
                 div: this.div,
-                x : this.domain.x(),
-                y : this.domain.y(),
+                x: this.domain.x(),
+                y: this.domain.y(),
                 data: z,
                 colorScale: this.colorScale,
                 domain: this.domain,
                 zmin: this.zmin,
                 zmax: this.zmax,
-                spacing: Math.round(this.spacing)
+                spacing: this.spacing_
             })
         }
         else {

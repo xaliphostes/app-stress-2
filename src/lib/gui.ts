@@ -5,6 +5,7 @@ import { domainBouds } from "./CostDomain2D"
 import { colorTables } from "./colorTables"
 import { AxeSwitcher } from "./AxeSwitcher"
 import { MenuBuilder } from "./MenuBuilder"
+import { FolderSwitcher } from "./FolderSwitcher"
 
 export function createGUI(div: string) {
 
@@ -15,6 +16,8 @@ export function createGUI(div: string) {
     const model = parameters.model
     const domain = parameters.domain
     const domains = parameters.domains
+
+    const folderSwitcher = new FolderSwitcher()
 
     // ---------------------------------------------------------------------------------
     {
@@ -37,21 +40,23 @@ export function createGUI(div: string) {
     //          Data
     // -------------------------------------
     {
-        const datas = pane.addFolder({
+        const dataFolder = pane.addFolder({
             title: 'Data',
         })
-        datas.addButton({
+        dataFolder.addButton({
             title: 'Upload data',
         }).on('click', () => document.getElementById('upload').click()) // simulate a click
 
-        datas.addButton({
+        dataFolder.addButton({
             title: 'Info'
         }).on('click', () => {
         })
 
-        datas.addButton({
+        dataFolder.addButton({
             title: 'Clear'
         }).on('click', () => model.clear())
+
+        folderSwitcher.addFolder(dataFolder)
     }
 
     // -------------------------------------
@@ -59,19 +64,21 @@ export function createGUI(div: string) {
     // -------------------------------------
 
     {
-        const simulation = pane.addFolder({
+        const simulFolder = pane.addFolder({
             title: 'Simulation',
         })
-        simulation.addBlade({
+        simulFolder.addBlade({
             view: 'slider',
             label: 'Iterations',
             min: 100,
             max: 100000,
             value: 1000,
         })
-        simulation.addButton({
+        simulFolder.addButton({
             title: 'Run'
         }).on('click', () => model.run())
+
+        folderSwitcher.addFolder(simulFolder)
     }
 
     // -------------------------------------
@@ -79,7 +86,7 @@ export function createGUI(div: string) {
     // -------------------------------------
 
     {
-        const domai = pane.addFolder({
+        const domainFolder = pane.addFolder({
             title: 'Domain',
         })
 
@@ -98,7 +105,7 @@ export function createGUI(div: string) {
 
         // ----------------------------------------
 
-        x = domai.addBlade({
+        x = domainFolder.addBlade({
             view: 'list',
             label: 'X axis',
             options: [
@@ -128,7 +135,7 @@ export function createGUI(div: string) {
 
         // ----------------------------------------
 
-        y = domai.addBlade({
+        y = domainFolder.addBlade({
             view: 'list',
             label: 'Y axis',
             options: [
@@ -158,7 +165,7 @@ export function createGUI(div: string) {
 
         // ----------------------------------------
 
-        sx = domai.addBlade({
+        sx = domainFolder.addBlade({
             view: 'slider',
             label: 'ψ',
             min: 0,
@@ -172,7 +179,7 @@ export function createGUI(div: string) {
 
         // ----------------------------------------
 
-        sy = domai.addBlade({
+        sy = domainFolder.addBlade({
             view: 'slider',
             label: 'φ',
             min: 0,
@@ -184,7 +191,7 @@ export function createGUI(div: string) {
             domain.setParameter(switcher.sy, e.value)
         })
 
-        const smin = domai.addBlade({
+        const smin = domainFolder.addBlade({
             view: 'slider',
             label: 'Min',
             min: 0,
@@ -197,7 +204,7 @@ export function createGUI(div: string) {
             domain.generate()
         })
 
-        const smax = domai.addBlade({
+        const smax = domainFolder.addBlade({
             view: 'slider',
             label: 'Max',
             min: 0,
@@ -210,82 +217,27 @@ export function createGUI(div: string) {
             domain.generate()
         })
 
-        const space = domai.addBlade({
+        const space = domainFolder.addBlade({
             view: 'slider',
             label: 'Spacing',
-            min: 0.001,
-            max: 1,
-            step: 0.01,
-            value: 0.1,
+            min: 2,
+            max: 100,
+            step: 1,
+            value: 1,
         }) as SliderBladeApi
         space.on('change', (e) => {
-            domain.spacing = e.value
+            domain.nbr = e.value
             domain.generate()
         })
 
-        domai.addBlade({
+        domainFolder.addBlade({
             view: 'separator',
         });
 
-        domai.addBinding(domain, 'min', { label: 'Real min', readonly: true })
-        domai.addBinding(domain, 'max', { label: 'Real max', readonly: true })
+        domainFolder.addBinding(domain, 'min', { label: 'Real min', readonly: true })
+        domainFolder.addBinding(domain, 'max', { label: 'Real max', readonly: true })
 
-        // const min = domai.addBlade({
-        //     view: 'text',
-        //     label: 'Min value',
-        //     parse: (v) => String(v),
-        //     value: '0',
-        //     readonly: true,
-        // })
-        // const max = domai.addBlade({
-        //     view: 'text',
-        //     label: 'Max value',
-        //     parse: (v) => String(v),
-        //     value: '1',
-        //     readonly: true,
-        // })
-
-        domai.addButton({
-            title: 'Generate domain'
-        }).on('click', () => model.updateDomain())
-
-        // ----------------------------------------
-
-        const domaiFolder = domai.addFolder({
-            title: 'Visu',
-        })
-
-        // ----------------------------------------
-
-        const slider = domaiFolder.addBlade({
-            view: 'slider',
-            label: 'Sampling',
-            min: 100,
-            max: 10000,
-            step: 1,
-            value: 1000,
-        }) as SliderBladeApi
-        slider.on('change', (e) => {
-            domain.changeSampling(e.value)
-        })
-
-        // ----------------------------------------
-
-        const slider2 = domaiFolder.addBlade({
-            view: 'slider',
-            label: 'Point size',
-            min: 1,
-            max: 10,
-            step: 1,
-            value: 5,
-        }) as SliderBladeApi
-        slider2.on('change', (e) => {
-            domain.changeMarkerSize(e.value)
-        })
-
-        // ----------------------------------------
-
-        const colorScales = domaiFolder.addBlade({
+        const colorScales = domainFolder.addBlade({
             view: 'list',
             label: 'Color table',
             options: colorTables.map(name => {
@@ -300,7 +252,47 @@ export function createGUI(div: string) {
             domain.changeColorScale(e.value)
         })
 
-        domaiFolder.expanded = false
+        domainFolder.addButton({
+            title: 'Generate domain'
+        }).on('click', () => model.updateDomain())
+
+        folderSwitcher.addFolder(domainFolder)
+
+        // ----------------------------------------
+
+        // const domainFolder2 = domainFolder.addFolder({
+        //     title: 'Visu',
+        // })
+
+        // ----------------------------------------
+
+        // const slider = domainFolder2.addBlade({
+        //     view: 'slider',
+        //     label: 'Sampling',
+        //     min: 100,
+        //     max: 10000,
+        //     step: 1,
+        //     value: 1000,
+        // }) as SliderBladeApi
+        // slider.on('change', (e) => {
+        //     domain.changeSampling(e.value)
+        // })
+
+        // // ----------------------------------------
+
+        // const slider2 = domainFolder2.addBlade({
+        //     view: 'slider',
+        //     label: 'Point size',
+        //     min: 1,
+        //     max: 10,
+        //     step: 1,
+        //     value: 5,
+        // }) as SliderBladeApi
+        // slider2.on('change', (e) => {
+        //     domain.changeMarkerSize(e.value)
+        // })
+
+        // ----------------------------------------
     }
 
     // -------------------------------------
@@ -308,10 +300,10 @@ export function createGUI(div: string) {
     // -------------------------------------
 
     {
-        const domai = pane.addFolder({
+        const domainsFolder = pane.addFolder({
             title: 'Domains',
         })
-        const slider = domai.addBlade({
+        const slider = domainsFolder.addBlade({
             view: 'slider',
             label: 'Sampling',
             min: 100,
@@ -323,7 +315,7 @@ export function createGUI(div: string) {
             domains.changeSampling(e.value)
         })
 
-        const slider2 = domai.addBlade({
+        const slider2 = domainsFolder.addBlade({
             view: 'slider',
             label: 'Point size',
             min: 1,
@@ -335,7 +327,7 @@ export function createGUI(div: string) {
             domains.changeMarkerSize(e.value)
         })
 
-        const colorScales = domai.addBlade({
+        const colorScales = domainsFolder.addBlade({
             view: 'list',
             label: 'Color table',
             options: colorTables.map(name => {
@@ -350,21 +342,21 @@ export function createGUI(div: string) {
             domains.changeColorScale(e.value)
         })
 
-        domai.addButton({
+        domainsFolder.addButton({
             title: 'Generate domain'
         }).on('click', () => model.updateDomains())
 
-        domai.expanded = false
+        folderSwitcher.addFolder(domainsFolder)
     }
 
     // -------------------------------------
     //          Histogram...
     // -------------------------------------
     {
-        const histo = pane.addFolder({
+        const histoFolder = pane.addFolder({
             title: 'Histogram',
         })
-        const h = histo.addBlade({
+        const h = histoFolder.addBlade({
             view: 'slider',
             label: 'Nb bins',
             min: 2,
@@ -374,14 +366,14 @@ export function createGUI(div: string) {
         h.on('change', (e) => {
         })
 
-        histo.expanded = false
+        folderSwitcher.addFolder(histoFolder)
     }
 
     // -------------------------------------
     //          Iso surface...
     // -------------------------------------
     {
-        const isoFolder = pane.addFolder({
+        const isoFolder  = pane.addFolder({
             title: 'Cube 3D',
         })
         const h = isoFolder.addBlade({
@@ -424,5 +416,11 @@ export function createGUI(div: string) {
         isoFolder.addButton({
             title: 'Generate'
         }).on('click', () => parameters.domain3D.plot())
+
+        folderSwitcher.addFolder(isoFolder)
     }
+
+
+    // ===============================================
+    folderSwitcher.openFirst()
 }
