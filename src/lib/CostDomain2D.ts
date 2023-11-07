@@ -1,5 +1,5 @@
 import {
-    Axis, Bounds, Data, FullParameterSpace,
+    Axis, Bounds, Data, RegularDomain2D, Domain, FullParameterSpace,
     ParameterSpace, RandomDomain2D,
     hasOwn
 } from "../../../stress/src/lib"
@@ -21,35 +21,79 @@ export const domainBouds = {
 export class CostDomain {
     private div = ''
     private engine: Engine = undefined
-    private domain: RandomDomain2D = undefined
+    private domain: Domain = undefined
     private space: ParameterSpace = undefined
     private xAxis: Axis
     private yAxis: Axis
     private markerSize = 5
     private colorScale = 'Portland'
+    private regular = true
+    zmin = 0
+    zmax = 2
+    spacing_ = 0.1
+    private min_ = 0
+    private max_ = 2
 
-    constructor({ div, engine }: { div: string, engine: Engine }) {
+    constructor({ div, engine, regular = true }: { div: string, engine: Engine, regular?: boolean }) {
         this.engine = engine
         this.div = div
+        this.regular = regular
 
         this.space = new FullParameterSpace({ engine: this.engine })
 
-        this.xAxis = {
-            bounds: [0, 1] as Bounds,
-            name: 'R'
-        }
+        if (regular) {
+            this.xAxis = {
+                bounds: [0, 1] as Bounds,
+                name: 'R',
+            }
 
-        this.yAxis = {
-            bounds: [0, 180] as Bounds,
-            name: 'theta'
-        }
+            this.yAxis = {
+                bounds: [0, 180] as Bounds,
+                name: 'theta'
+            }
 
-        this.domain = new RandomDomain2D({
-            space: this.space,
-            xAxis: this.xAxis,
-            yAxis: this.yAxis,
-            n: 1000
-        })
+            this.domain = new RegularDomain2D({
+                space: this.space,
+                xAxis: this.xAxis,
+                yAxis: this.yAxis,
+                n: 50
+            })
+        }
+        else {
+            this.xAxis = {
+                bounds: [0, 1] as Bounds,
+                name: 'R'
+            }
+
+            this.yAxis = {
+                bounds: [0, 180] as Bounds,
+                name: 'theta'
+            }
+
+            this.domain = new RandomDomain2D({
+                space: this.space,
+                xAxis: this.xAxis,
+                yAxis: this.yAxis,
+                n: 1000
+            })
+        }
+    }
+
+    get min() {
+        return this.min_
+    }
+    set min(v: number) {
+        // nothing
+    }
+    get max() {
+        return this.max_
+    }
+    set max(v: number) {
+        // nothing
+    }
+
+    set nbr(v: number) {
+        this.spacing_ = (this.max_ - this.min_) / v
     }
 
     changeSampling(n: number) {
@@ -114,21 +158,46 @@ export class CostDomain {
         this.generate()
     }
 
+    getParameter(name: string): number {
+        if (hasOwn(this.space, name) === false) {
+            throw `parameter-space does not have property named ${name}`
+        }
+        return this.space[name]
+    }
+
     setData(data: Data[]) {
         this.space.setData(data)
     }
 
     generate() {
         const z = this.domain.run()
-        console.log(minMaxArray(z))
 
-        scatterPlot({
-            div: this.div,
-            x: this.domain.x(),
-            y: this.domain.y(),
-            data: z,
-            markerSize: this.markerSize,
-            colorScale: this.colorScale
-        })
+        const mm = minMaxArray(z)
+        this.min_ = mm[0]
+        this.max_ = mm[1]
+
+        if (this.regular) {
+            doDomain({
+                div: this.div,
+                x: this.domain.x(),
+                y: this.domain.y(),
+                data: z,
+                colorScale: this.colorScale,
+                domain: this.domain,
+                zmin: this.zmin,
+                zmax: this.zmax,
+                spacing: this.spacing_
+            })
+        }
+        else {
+            scatterPlot({
+                div: this.div,
+                x: this.domain.x(),
+                y: this.domain.y(),
+                data: z,
+                colorScale: this.colorScale,
+                markerSize: this.markerSize
+            })
+        }
     }
 }

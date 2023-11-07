@@ -5,7 +5,7 @@ body {
 }
 
 .navbar {
-    z-index: 999;
+    z-index: 2;
     overflow: hidden;
     background-color: #000000;
     position: fixed;
@@ -20,7 +20,7 @@ body {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 999;
+    z-index: 2;
     top: 0;
     left: 0;
     background-color: #111;
@@ -241,4 +241,345 @@ footer {
     height: 30px;
     /* border: 2px;
     border-color: white; */
-  }
+}
+
+/* ------------------------------------------------------- */
+
+.radial {
+    position: relative;
+    /* margin-top: 100px; */
+}
+
+.radial .triggerButton {
+    position: absolute;
+    z-index: 9;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 50%;
+    text-decoration: none;
+    background-color: #4B40CC;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15), 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.15s ease-in-out;
+    transform: translate(-50%, -50%);
+}
+
+.radial .triggerButton i {
+    transition: all 0.2s ease-in-out;
+}
+
+.radial .radialMenu {
+    --width: 300px;
+    width: var(--width);
+    height: var(--width);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 0;
+    margin: 0;
+    transform: translate(-50%, -50%);
+}
+
+.radial .radialItem {
+    list-style: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%);
+    transition: all .3s ease;
+}
+
+.radial .radialItem a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #fff;
+    border-radius: 50%;
+    background-color: #232E50;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15), 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    transition: .25s;
+}
+
+.radial .radialItem a:hover {
+    transition-delay: 0s;
+    background-color: #1b243e;
+}
+
+.radial.active .triggerButton i {
+    transform: rotateZ(135deg) translate(-1px, 3px);
+}
+
+.radial.active .radialItem {
+    --angle: 0deg;
+    --star-angle: 0deg;
+    --point-size: 60px;
+    --countItem: 8;
+    /* we subtract the point size to place point inside circle */
+    --radius: calc((var(--width) / 2) - (var(--point-size) / 2));
+    --x: calc(var(--radius) * cos(var(--angle) + var(--star-angle)));
+    --y: calc(var(--radius) * sin(var(--angle) + var(--star-angle)));
+    /* position point at center of circle with radius. We add x and y values to move to edge of circle. */
+    top: calc(var(--radius) + var(--y) + (var(--point-size) / 2));
+    left: calc(var(--radius) + var(--x) + (var(--point-size) / 2));
+    width: var(--point-size);
+    height: var(--point-size);
+}
+
+.radial.active .radialItem:nth-child(1) {
+    --angle: calc((360deg / var(--countItem)) * 0);
+    transition-delay: 0.05s;
+}
+
+.radial.active .radialItem:nth-child(2) {
+    --angle: calc((360deg / var(--countItem)) * 1);
+    transition-delay: 0.1s;
+}
+
+.radial.active .radialItem:nth-child(3) {
+    --angle: calc((360deg / var(--countItem)) * 2);
+    transition-delay: 0.15s;
+}
+
+.radial.active .radialItem:nth-child(4) {
+    --angle: calc((360deg / var(--countItem)) * 3);
+    transition-delay: 0.20s;
+}
+
+.radial.active .radialItem:nth-child(5) {
+    --angle: calc((360deg / var(--countItem)) * 4);
+    transition-delay: 0.25s;
+}
+
+.radial.active .radialItem:nth-child(6) {
+    --angle: calc((360deg / var(--countItem)) * 5);
+    transition-delay: 0.30s;
+}
+
+.radial.active .radialItem:nth-child(7) {
+    --angle: calc((360deg / var(--countItem)) * 6);
+    transition-delay: 0.35s;
+}
+
+.radial.active .radialItem:nth-child(8) {
+    --angle: calc((360deg / var(--countItem)) * 7);
+    transition-delay: 0.40s;
+}
+
+.radial.circle-center .triggerButton {
+    background-color: #89d8d3;
+    background-image: linear-gradient(135deg, #89d8d3 0%, #03c8a8 74%);
+}
+
+.radial.circle-center .radialItem a {
+    background-image: linear-gradient(135deg, #40e495, #2bb673);
+}
+
+.radial.circle-center .radialItem a:hover {
+    transform: translateY(-5px);
+}
+
+.radial.half-top {
+    position: relative;
+    margin-top: 400px;
+}
+
+.radial.half-top.active .radialItem {
+    --angle: 0deg;
+    --star-angle: 180deg;
+    --point-size: 60px;
+    --countItem: 8;
+    width: var(--point-size);
+    height: var(--point-size);
+}
+
+.radial.half-top.active .radialItem:nth-child(1) {
+    --angle: calc((360deg / var(--countItem)) * 0);
+    transition-delay: 0.05s;
+}
+
+.radial.half-top.active .radialItem:nth-child(2) {
+    --angle: calc((360deg / var(--countItem)) * 1);
+    transition-delay: 0.1s;
+}
+
+.radial.half-top.active .radialItem:nth-child(3) {
+    --angle: calc((360deg / var(--countItem)) * 2);
+    transition-delay: 0.15s;
+}
+
+.radial.half-top.active .radialItem:nth-child(4) {
+    --angle: calc((360deg / var(--countItem)) * 3);
+    transition-delay: 0.20s;
+}
+
+.radial.half-top.active .radialItem:nth-child(5) {
+    --angle: calc((360deg / var(--countItem)) * 4);
+    transition-delay: 0.25s;
+}
+
+.radial.half-top .triggerButton {
+    background: #fb2175;
+    background: linear-gradient(0deg, #fb2175 0%, #ea4c89 100%);
+}
+
+.radial.half-top .radialItem a {
+    background: #ed6ea0;
+    background-image: linear-gradient(135deg, #ed6ea0, #f7186a);
+}
+
+.radial.half-top .radialItem a:hover {
+    transform: translateY(-5px);
+}
+
+.radial.half-bottom {
+    position: relative;
+    margin-top: 600px;
+}
+
+.radial.half-bottom.active .radialItem {
+    --angle: 0deg;
+    --star-angle: 0deg;
+    --point-size: 60px;
+    --countItem: 8;
+    width: var(--point-size);
+    height: var(--point-size);
+}
+
+.radial.half-bottom.active .radialItem:nth-child(1) {
+    --angle: calc((360deg / var(--countItem)) * 0);
+    transition-delay: 0.05s;
+}
+
+.radial.half-bottom.active .radialItem:nth-child(2) {
+    --angle: calc((360deg / var(--countItem)) * 1);
+    transition-delay: 0.1s;
+}
+
+.radial.half-bottom.active .radialItem:nth-child(3) {
+    --angle: calc((360deg / var(--countItem)) * 2);
+    transition-delay: 0.15s;
+}
+
+.radial.half-bottom.active .radialItem:nth-child(4) {
+    --angle: calc((360deg / var(--countItem)) * 3);
+    transition-delay: 0.20s;
+}
+
+.radial.half-bottom.active .radialItem:nth-child(5) {
+    --angle: calc((360deg / var(--countItem)) * 4);
+    transition-delay: 0.25s;
+}
+
+.radial.half-bottom .triggerButton {
+    background: #1609f0;
+    background: linear-gradient(0deg, #1609f0 0%, #316ef4 100%);
+}
+
+.radial.half-bottom .radialItem a {
+    transform: scale(1);
+    background: #00acee;
+    background: linear-gradient(0deg, #00acee 0%, #027efb 100%);
+}
+
+.radial.half-bottom .radialItem a:hover {
+    transform: scale(1.2);
+}
+
+.radial.quarter-left {
+    position: relative;
+    margin-top: 900px;
+}
+
+.radial.quarter-left.active .radialItem {
+    --angle: 0deg;
+    --star-angle: 180deg;
+    --point-size: 60px;
+    --countItem: 8;
+    width: var(--point-size);
+    height: var(--point-size);
+}
+
+.radial.quarter-left.active .radialItem:nth-child(1) {
+    --angle: calc((360deg / var(--countItem)) * 0);
+    transition-delay: 0.05s;
+}
+
+.radial.quarter-left.active .radialItem:nth-child(2) {
+    --angle: calc((360deg / var(--countItem)) * 1);
+    transition-delay: 0.1s;
+}
+
+.radial.quarter-left.active .radialItem:nth-child(3) {
+    --angle: calc((360deg / var(--countItem)) * 2);
+    transition-delay: 0.15s;
+}
+
+.radial.quarter-left .triggerButton {
+    background-color: #1fd1f9;
+    background-image: linear-gradient(135deg, #1fd1f9 0%, #b621fe 74%);
+}
+
+.radial.quarter-left .radialItem a {
+    transform: scale(1);
+    background: #6009f0;
+    background: linear-gradient(-135deg, #6009f0 0%, #8105f0 100%);
+}
+
+.radial.quarter-left .radialItem a:hover {
+    transform: scale(1.2);
+}
+
+.radial.quarter-right {
+    position: relative;
+    margin-top: 1200px;
+}
+
+.radial.quarter-right.active .radialItem {
+    --angle: 0deg;
+    --star-angle: 270deg;
+    --point-size: 60px;
+    --countItem: 8;
+    width: var(--point-size);
+    height: var(--point-size);
+}
+
+.radial.quarter-right.active .radialItem:nth-child(1) {
+    --angle: calc((360deg / var(--countItem)) * 0);
+    transition-delay: 0.05s;
+}
+
+.radial.quarter-right.active .radialItem:nth-child(2) {
+    --angle: calc((360deg / var(--countItem)) * 1);
+    transition-delay: 0.1s;
+}
+
+.radial.quarter-right.active .radialItem:nth-child(3) {
+    --angle: calc((360deg / var(--countItem)) * 2);
+    transition-delay: 0.15s;
+}
+
+.radial.quarter-right .triggerButton {
+    background-image: linear-gradient(-45deg, #009245, #D9E021);
+}
+
+.radial.quarter-right .radialItem a {
+    transform: scale(1.1);
+    background: #6009f0;
+    background-image: linear-gradient(135deg, #25aae1, #2bb673);
+}
+
+.radial.quarter-right .radialItem a:hover {
+    transform: scale(0.8);
+}

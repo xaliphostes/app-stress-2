@@ -6,6 +6,12 @@ enum AxeEnum {
     phi = 8
 }
 
+/**
+ * Helper to switch for axis in a 4 dim parameters space.
+ * When changing the domain axis, it automatically setup the other
+ * three parameters (e.g., the other axis and the two other parameters
+ * as sliders)
+ */
 export class AxeSwitcher {
     x = 'R'
     y = 'theta'
@@ -26,14 +32,23 @@ export class AxeSwitcher {
         this.axeName.set('phi', 'φ')
     }
 
+    /**
+     * Get the real name (not the greek letter) of the 3rd parameter
+     */
     getSx() {
         return this.axeName.get(this.sx)
     }
 
+    /**
+     * Get the real name (not the greek letter) of the 4th parameter
+     */
     getSy() {
         return this.axeName.get(this.sy)
     }
 
+    /**
+     * Set the first parameter of the 2D domain
+     */
     setX(name: string): boolean {
         if (this.x === name || this.y === name) {
             return false
@@ -44,6 +59,9 @@ export class AxeSwitcher {
         return true
     }
 
+    /**
+     * Set the second parameter of the 2D domain
+     */
     setY(name: string): boolean {
         if (this.x === name || this.y === name) {
             return false
