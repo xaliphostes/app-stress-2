@@ -7,8 +7,6 @@ import {
 import { Engine } from "../../../stress/src/lib/geomeca"
 import { scatterPlot } from "./scatterPlot"
 import { minMaxArray } from '@youwol/math'
-import { triangulate, InterpolateInGrid2D } from '@youwol/geometry'
-import { Serie, array } from '@youwol/dataframe'
 import { doDomain } from "./doDomain"
 
 export const domainBouds = {
