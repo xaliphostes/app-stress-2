@@ -1,13 +1,17 @@
-import { trimAll, DataFactory, Data, InverseMethod, MisfitCriteriunSolution } from '../../../stress/src/lib'
+import { eigen } from '@youwol/math'
+import { trimAll, DataFactory, Data, InverseMethod, MisfitCriteriunSolution, MonteCarlo } from '../../../stress/src/lib'
 import { parameters } from './parameters'
 
 export class Model {
     private inv: InverseMethod = undefined
-    // private domain: CostDomain = undefined
+    private solution: MisfitCriteriunSolution = undefined
 
     constructor() {
         this.inv = new InverseMethod()
-        // this.domain = new CostDomain({div: 'divDomain', engine: this.inv.engine})
+    }
+
+    get data() {
+        return this.inv.data
     }
 
     get engine() {
@@ -32,10 +36,11 @@ export class Model {
                 continue
             }
 
-            const toks = line.split(';').map(s => s.replace(',', '.'))
+            let toks = line.split(';').map(s => s.replace(',', '.'))
             if (toks.length === 0) {
                 continue
             }
+            toks = toks.map( tok => trimAll(tok) )
 
             const data = DataFactory.create(toks[1])
 
@@ -68,8 +73,15 @@ export class Model {
         }
     }
 
+    setNbIter(n: number) {
+        const method = this.inv.searchMethod as MonteCarlo
+        method.setNbIter(n)
+    }
+
     run() {
-        this.displayResults(this.inv.run())
+        this.solution = this.inv.run()
+        this.displayResults(this.solution)
+        parameters.histogram.generate()
     }
 
     updateDomain() {
@@ -85,11 +97,27 @@ export class Model {
         this.inv.clearData()
     }
 
+    getMisfitAngles(): number[] {
+        this.inv.engine.setHypotheticalStress(this.solution.rotationMatrixW, this.solution.stressRatio)
+        const s = this.inv.engine.stress([0,0,0])
+        return this.inv.data.map( d => d.predict({stress: s})*180/Math.PI )
+    }
+
     displayResults(solution: MisfitCriteriunSolution) {
+        this.inv.engine.setHypotheticalStress(solution.rotationMatrixW, solution.stressRatio)
+        const s = this.inv.engine.stress([0,0,0])
+        let misfitAngles = "<ol>"
+        this.inv.data.forEach( d => {
+            const m = d.predict({stress: s})*180/Math.PI
+            misfitAngles += `<li>${m.toFixed(1)}°`
+        })
+        misfitAngles += "</ol>"
+
         const stress = solution.stressTensorSolution
+        const eig = eigen([stress[0][0], stress[0][1], stress[0][2], stress[1][1], stress[1][2], stress[2][2]])
 
         document.getElementById("info").innerHTML = `<div>
-            <center><h3>Inversion results</h3></center>
+            <h3>Inversion results</h3>
             <table>
                 <tbody>
                     <tr>
@@ -131,6 +159,21 @@ export class Model {
                     </mrow>
                 </math>
             </div>
+            <br>
+            &sigma;1 = [${eig.vectors[6].toFixed(3)}, ${eig.vectors[7].toFixed(3)}, ${eig.vectors[8].toFixed(3)}]
+            <br>
+            &sigma;2 = [${eig.vectors[3].toFixed(3)}, ${eig.vectors[4].toFixed(3)}, ${eig.vectors[5].toFixed(3)}]
+            <br>
+            &sigma;3 = [${eig.vectors[0].toFixed(3)}, ${eig.vectors[1].toFixed(3)}, ${eig.vectors[2].toFixed(3)}]
+            <br><br>
+            &sigma;1 = [${-eig.values[2].toFixed(3)}]
+            <br>
+            &sigma;2 = [${-eig.values[1].toFixed(3)}]
+            <br>
+            &sigma;3 = [${-eig.values[0].toFixed(3)}]
+            <br><br>
+            <h3>Data misfit angles:</h3>
+            ${misfitAngles}
         </div>`
     }
 }

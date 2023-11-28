@@ -23,9 +23,11 @@ export function createGUI(div: string) {
     {
         const upload = document.getElementById('upload') as HTMLInputElement
         upload.onchange = () => {
-            upload.files[0].arrayBuffer().then(arrayBuffer => {
-                model.addDataFromBuffer(arrayBuffer)
-            })
+            for (const file of upload.files) {
+                file.arrayBuffer().then(arrayBuffer => {
+                    model.addDataFromBuffer(arrayBuffer)
+                })
+            }
         }
     }
     // ---------------------------------------------------------------------------------
@@ -67,13 +69,18 @@ export function createGUI(div: string) {
         const simulFolder = pane.addFolder({
             title: 'Simulation',
         })
-        simulFolder.addBlade({
+        const iter = simulFolder.addBlade({
             view: 'slider',
             label: 'Iterations',
             min: 100,
-            max: 100000,
+            max: 500000,
             value: 1000,
+            format: (v) => v.toFixed(0)
+        }) as ListBladeApi<number>
+        iter.on( 'change', e => {
+            model.setNbIter(e.value)
         })
+
         simulFolder.addButton({
             title: 'Run'
         }).on('click', () => model.run())
@@ -89,6 +96,11 @@ export function createGUI(div: string) {
         const domainFolder = pane.addFolder({
             title: 'Domain',
         })
+
+        const TEST = {
+            show: true
+        }
+        domainFolder.addBinding(TEST, 'show')
 
         let x = undefined
         let y = undefined
@@ -364,9 +376,30 @@ export function createGUI(div: string) {
             value: 10
         }) as SliderBladeApi
         h.on('change', (e) => {
+            parameters.histogram.generate()
         })
 
+        histoFolder.addButton({
+            title: 'Generate'
+        }).on('click', () => parameters.histogram.generate())
+
+
         folderSwitcher.addFolder(histoFolder)
+    }
+
+    // -------------------------------------
+    //          Scatter plot...
+    // -------------------------------------
+    {
+        const scatterFolder = pane.addFolder({
+            title: 'Scatter',
+        })
+        scatterFolder.addButton({
+            title: 'Generate'
+        }).on('click', () => parameters.scatter.generate())
+
+
+        folderSwitcher.addFolder(scatterFolder)
     }
 
     // -------------------------------------
